@@ -1,0 +1,210 @@
+:root {
+  --bg: #1c1b18;
+  --surface: #242220;
+  --surface-raised: #2b2925;
+  --border: #3c382f;
+  --border-soft: #302d27;
+  --amber: #e8a33d;
+  --amber-dim: #8a6a34;
+  --teal: #5f9089;
+  --brick: #b25438;
+  --text: #f3efe7;
+  --text-muted: #a49b8a;
+  --text-faint: #6e6858;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--amber);
+}
+a:hover {
+  color: #f0ae4d;
+}
+
+.display {
+  font-family: 'Fraunces', serif;
+  font-optical-sizing: auto;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.panel-title {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 18px;
+  color: var(--text);
+}
+
+.field {
+  margin-bottom: 11px;
+}
+.field label {
+  display: block;
+  color: var(--text-faint);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.field input {
+  width: 100%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  padding: 9px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+}
+.field input:disabled {
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--amber-dim);
+}
+.field .hint {
+  color: var(--text-faint);
+  font-size: 10.5px;
+  margin-top: 5px;
+}
+
+.btn-primary {
+  padding: 13px;
+  border-radius: 3px;
+  border: 1px solid var(--amber);
+  background: var(--amber);
+  color: #1c1b18;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: #f0ae4d;
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-primary.active {
+  background: transparent;
+  color: var(--amber);
+}
+.btn-primary.active:hover {
+  background: rgba(232, 163, 61, 0.08);
+}
+
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 8px 13px;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  border-color: var(--amber-dim);
+  color: var(--text);
+}
+.btn-ghost:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pill {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.pill:hover {
+  border-color: var(--amber-dim);
+  color: var(--text);
+}
+.pill.selected {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(232, 163, 61, 0.08);
+}
+
+.error-text {
+  color: var(--brick);
+  font-size: 11.5px;
+  margin-top: 6px;
+}
+.saved-note {
+  color: var(--teal);
+  font-size: 11.5px;
+}
+
+/* MFA enrollment - shared between Settings > Security and the signup flow */
+.qr-box {
+  width: 132px;
+  height: 132px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin-bottom: 14px;
+  object-fit: contain;
+  background: var(--surface-raised);
+}
+.secret-key {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: 3px;
+  padding: 8px 11px;
+  color: var(--amber);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.recovery-codes {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: 3px;
+}
+.recovery-codes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--amber);
+  font-size: 12px;
+}

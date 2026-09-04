@@ -1,0 +1,4 @@
+# Force LF line endings for all text files regardless of each machine's local git config
+# (core.autocrlf differs between this Windows checkout and a Mac clone) - avoids the whole
+# repo showing as changed on the first commit from a second machine.
+* text=auto eol=lf

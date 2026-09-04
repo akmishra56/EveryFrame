@@ -1,0 +1,16 @@
+node_modules/
+dist/
+captures/
+data/
+certs/
+.env
+.env.local
+.env.*.local
+!.env.example
+*.log
+.claude/
+
+# Design canvas working files and the published Artifact HTML - kept as local
+# PDF snapshots in artifacts-local/ instead (see README.md).
+design-canvas/
+artifacts-local/

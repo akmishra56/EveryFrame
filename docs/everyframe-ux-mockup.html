@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EveryFrame — capture UI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1c1b18;
+    --surface:#242220;
+    --surface-raised:#2b2925;
+    --border:#3c382f;
+    --border-soft:#302d27;
+    --amber:#e8a33d;
+    --amber-dim:#8a6a34;
+    --teal:#5f9089;
+    --brick:#b25438;
+    --text:#f3efe7;
+    --text-muted:#a49b8a;
+    --text-faint:#6e6858;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+  }
+
+  /* ---- shell ---- */
+  .shell{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 24px 60px;
+  }
+
+  /* ---- header ---- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--border-soft);
+    margin-bottom:28px;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+  }
+  .wordmark{
+    font-size:26px;
+    font-weight:600;
+    letter-spacing:0.01em;
+    color:var(--text);
+  }
+  .tagline{
+    color:var(--text-faint);
+    font-size:12.5px;
+  }
+  .status-pill{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:7px 14px;
+    border:1px solid var(--border);
+    border-radius:3px;
+    background:var(--surface);
+  }
+  .dot{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--text-faint);
+    flex-shrink:0;
+  }
+  .dot.live{
+    background:var(--amber);
+    box-shadow:0 0 0 0 rgba(232,163,61,.6);
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(232,163,61,.55); }
+    70%{ box-shadow:0 0 0 7px rgba(232,163,61,0); }
+    100%{ box-shadow:0 0 0 0 rgba(232,163,61,0); }
+  }
+  .status-pill span{ font-size:12px; color:var(--text-muted); }
+
+  /* ---- layout: rail | sprockets | log ---- */
+  .layout{
+    display:grid;
+    grid-template-columns:380px 28px 1fr;
+    gap:0 22px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{ grid-template-columns:1fr; }
+    .sprockets{ display:none; }
+  }
+
+  .sprockets{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    padding-top:8px;
+    height:100%;
+  }
+  .sprockets div{
+    width:6px; height:6px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--bg);
+    flex-shrink:0;
+  }
+
+  /* ---- config rail ---- */
+  .panel-title{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:600;
+    margin:0 0 18px;
+    color:var(--text);
+  }
+  .step{
+    border:1px solid var(--border-soft);
+    border-radius:3px;
+    background:var(--surface);
+    padding:16px 16px 18px;
+    margin-bottom:14px;
+  }
+  .step-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .step-num{
+    width:19px; height:19px;
+    border-radius:50%;
+    border:1px solid var(--amber-dim);
+    color:var(--amber);
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .step-label{
+    color:var(--text);
+    font-size:13px;
+    font-weight:500;
+  }
+
+  .tab-option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px;
+    border:1px solid transparent;
+    border-radius:3px;
+    cursor:pointer;
+    margin-bottom:4px;
+  }
+  .tab-option:hover{ background:var(--surface-raised); }
+  .tab-option.selected{
+    border-color:var(--amber-dim);
+    background:var(--surface-raised);
+  }
+  .tab-radio{
+    width:13px; height:13px;
+    border-radius:50%;
+    border:1px solid var(--text-faint);
+    flex-shrink:0;
+    position:relative;
+  }
+  .tab-option.selected .tab-radio{ border-color:var(--amber); }
+  .tab-option.selected .tab-radio::after{
+    content:'';
+    position:absolute;
+    inset:3px;
+    border-radius:50%;
+    background:var(--amber);
+  }
+  .tab-favicon{
+    width:14px; height:14px;
+    border-radius:3px;
+    flex-shrink:0;
+  }
+  .tab-title{ color:var(--text); font-size:12.5px; }
+  .tab-url{ color:var(--text-faint); font-size:11px; margin-left:auto; }
+
+  .pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .pill{
+    padding:7px 12px;
+    border:1px solid var(--border);
+    border-radius:3px;
+    background:var(--surface-raised);
+    color:var(--text-muted);
+    font-size:12px;
+    cursor:pointer;
+  }
+  .pill:hover{ border-color:var(--amber-dim); color:var(--text); }
+  .pill.selected{
+    border-color:var(--amber);
+    color:var(--amber);
+    background:rgba(232,163,61,0.08);
+  }
+  .pill.custom{ display:flex; align-items:center; gap:6px; }
+  .pill.custom input{
+    width:38px;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--border);
+    color:var(--text);
+    font-family:inherit;
+    font-size:12px;
+    text-align:center;
+  }
+  .pill.custom input:focus{ outline:none; border-color:var(--amber); }
+
+  .field{ margin-bottom:11px; }
+  .field label{
+    display:block;
+    color:var(--text-faint);
+    font-size:11px;
+    margin-bottom:6px;
+  }
+  .field input{
+    width:100%;
+    background:var(--surface-raised);
+    border:1px solid var(--border);
+    border-radius:3px;
+    color:var(--text);
+    padding:9px 10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+  }
+  .field input:focus{ outline:none; border-color:var(--amber-dim); }
+  .field .hint{ color:var(--text-faint); font-size:10.5px; margin-top:5px; }
+
+  .preview-box{
+    background:var(--surface-raised);
+    border:1px solid var(--border-soft);
+    border-radius:3px;
+    padding:10px 12px;
+    color:var(--amber);
+    font-size:12px;
+    word-break:break-all;
+  }
+  .preview-box .dim{ color:var(--text-faint); }
+
+  .test-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:12px;
+  }
+  .btn-ghost{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:8px 13px;
+    border-radius:3px;
+    font-family:inherit;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .btn-ghost:hover{ border-color:var(--amber-dim); color:var(--text); }
+  .conn-status{
+    display:flex; align-items:center; gap:7px;
+    font-size:11px; color:var(--text-faint);
+  }
+
+  .btn-primary{
+    width:100%;
+    padding:13px;
+    border-radius:3px;
+    border:1px solid var(--amber);
+    background:var(--amber);
+    color:#1c1b18;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.01em;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .btn-primary:hover{ background:#f0ae4d; }
+  .btn-primary.active{
+    background:transparent;
+    color:var(--amber);
+  }
+  .btn-primary.active:hover{ background:rgba(232,163,61,0.08); }
+
+  /* ---- capture log ---- */
+  .log-header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .stats{
+    display:flex;
+    gap:26px;
+    margin-bottom:18px;
+  }
+  .stat-num{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    color:var(--text);
+    font-weight:600;
+    line-height:1;
+  }
+  .stat-label{
+    color:var(--text-faint);
+    font-size:10.5px;
+    margin-top:4px;
+  }
+
+  .log-strip{
+    border:1px solid var(--border-soft);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .log-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:11px 14px;
+    border-bottom:1px solid var(--border-soft);
+    background:var(--surface);
+  }
+  .log-row:last-child{ border-bottom:none; }
+  .frame-thumb{
+    width:44px; height:30px;
+    border-radius:2px;
+    border:1px solid var(--border);
+    flex-shrink:0;
+    background:linear-gradient(135deg, #34302a, #211f1c);
+  }
+  .log-file{
+    color:var(--text);
+    font-size:12px;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .log-time{
+    color:var(--text-faint);
+    font-size:11px;
+    width:74px;
+    flex-shrink:0;
+  }
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:11px;
+    padding:4px 9px;
+    border-radius:3px;
+    flex-shrink:0;
+  }
+  .chip.sent{ color:var(--teal); background:rgba(95,144,137,0.12); }
+  .chip.sending{ color:var(--amber); background:rgba(232,163,61,0.1); }
+  .chip.failed{ color:var(--brick); background:rgba(178,84,56,0.12); cursor:pointer; }
+  .chip .dot{ width:5px; height:5px; }
+  .chip.sent .dot{ background:var(--teal); }
+  .chip.sending .dot{ background:var(--amber); animation:pulse 1.2s infinite; }
+  .chip.failed .dot{ background:var(--brick); }
+
+  .empty-state{
+    border:1px dashed var(--border);
+    border-radius:3px;
+    padding:44px 20px;
+    text-align:center;
+    color:var(--text-faint);
+    font-size:12px;
+  }
+  .empty-state .frame-outline{
+    width:52px; height:36px;
+    border:1px solid var(--border);
+    border-radius:3px;
+    margin:0 auto 14px;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header>
+    <div class="brand">
+      <div class="wordmark display">EveryFrame</div>
+      <div class="tagline">Capture a tab. Send it to Telegram. On schedule.</div>
+    </div>
+    <div class="status-pill" id="statusPill">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText">Idle</span>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- CONFIG RAIL -->
+    <div class="rail">
+      <p class="panel-title">Configure capture</p>
+
+      <!-- Step 1: target tab -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">1</div>
+          <div class="step-label">Target tab</div>
+        </div>
+        <div id="tabList">
+          <div class="tab-option" data-name="grafana-prod" data-title="Grafana — Prod Dashboard">
+            <div class="tab-radio"></div>
+            <div class="tab-favicon" style="background:#e8a33d;"></div>
+            <div class="tab-title">Grafana — Prod Dashboard</div>
+          </div>
+          <div class="tab-option selected" data-name="localhost-3000" data-title="localhost:3000">
+            <div class="tab-radio"></div>
+            <div class="tab-favicon" style="background:#5f9089;"></div>
+            <div class="tab-title">localhost:3000</div>
+          </div>
+          <div class="tab-option" data-name="figma-onboarding" data-title="Figma — Onboarding flow">
+            <div class="tab-radio"></div>
+            <div class="tab-favicon" style="background:#b25438;"></div>
+            <div class="tab-title">Figma — Onboarding flow</div>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:8px;">Reads tabs from Chrome's remote debugging port. Only the selected tab is captured.</div>
+      </div>
+
+      <!-- Step 2: interval -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">2</div>
+          <div class="step-label">Capture interval</div>
+        </div>
+        <div class="pill-row" id="intervalRow">
+          <div class="pill" data-secs="30">30s</div>
+          <div class="pill selected" data-secs="60">1m</div>
+          <div class="pill" data-secs="300">5m</div>
+          <div class="pill" data-secs="900">15m</div>
+          <div class="pill custom" data-secs="custom">
+            <input type="number" id="customSecs" placeholder="—"> s
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: naming -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">3</div>
+          <div class="step-label">File name</div>
+        </div>
+        <div class="field">
+          <label>Name override</label>
+          <input type="text" id="nameOverride" value="localhost-3000">
+          <div class="hint">Sanitized automatically — spaces and symbols become hyphens.</div>
+        </div>
+        <div class="preview-box">
+          <span id="previewName">localhost-3000</span><span class="dim">_</span><span id="previewStamp">2026_09_04_14_30_00</span><span class="dim">.png</span>
+        </div>
+      </div>
+
+      <!-- Step 4: telegram -->
+      <div class="step">
+        <div class="step-head">
+          <div class="step-num">4</div>
+          <div class="step-label">Telegram delivery</div>
+        </div>
+        <div class="field">
+          <label>Bot token</label>
+          <input type="password" value="7839201:AA••••••••••••••••••••">
+        </div>
+        <div class="field">
+          <label>Channel ID</label>
+          <input type="text" value="@build-status-frames">
+        </div>
+        <div class="test-row">
+          <button class="btn-ghost" id="testBtn">Send test frame</button>
+          <div class="conn-status" id="connStatus"><div class="dot" style="background:var(--text-faint);"></div><span>Not tested</span></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="startBtn">Start capturing</button>
+    </div>
+
+    <!-- SPROCKETS -->
+    <div class="sprockets" id="sprockets"></div>
+
+    <!-- CAPTURE LOG -->
+    <div class="log">
+      <p class="panel-title">Capture log</p>
+
+      <div class="stats">
+        <div>
+          <div class="stat-num" id="statFrames">0</div>
+          <div class="stat-label">frames today</div>
+        </div>
+        <div>
+          <div class="stat-num" id="statNext">—</div>
+          <div class="stat-label">next capture</div>
+        </div>
+        <div>
+          <div class="stat-num" id="statLast">—</div>
+          <div class="stat-label">last sent</div>
+        </div>
+      </div>
+
+      <div id="logArea">
+        <div class="empty-state">
+          <div class="frame-outline"></div>
+          Frames will appear here once capture starts.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // sprocket holes
+  const sprockets = document.getElementById('sprockets');
+  for(let i=0;i<14;i++){ const d=document.createElement('div'); sprockets.appendChild(d); }
+
+  // tab selection
+  document.querySelectorAll('.tab-option').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-option').forEach(o=>o.classList.remove('selected'));
+      el.classList.add('selected');
+      const name = el.dataset.name;
+      document.getElementById('nameOverride').value = name;
+      updatePreview();
+    });
+  });
+
+  // interval selection
+  document.querySelectorAll('#intervalRow .pill').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if(el.classList.contains('custom') && e.target.tagName==='INPUT') return;
+      document.querySelectorAll('#intervalRow .pill').forEach(o=>o.classList.remove('selected'));
+      el.classList.add('selected');
+    });
+  });
+  document.getElementById('customSecs').addEventListener('focus', ()=>{
+    document.querySelectorAll('#intervalRow .pill').forEach(o=>o.classList.remove('selected'));
+    document.querySelector('.pill.custom').classList.add('selected');
+  });
+
+  // live timestamp preview
+  function pad(n){ return n.toString().padStart(2,'0'); }
+  function stamp(){
+    const d = new Date();
+    return `${d.getFullYear()}_${pad(d.getMonth()+1)}_${pad(d.getDate())}_${pad(d.getHours())}_${pad(d.getMinutes())}_${pad(d.getSeconds())}`;
+  }
+  function sanitize(s){ return s.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+  function updatePreview(){
+    document.getElementById('previewName').textContent = sanitize(document.getElementById('nameOverride').value || 'frame');
+  }
+  document.getElementById('nameOverride').addEventListener('input', updatePreview);
+  setInterval(()=>{ document.getElementById('previewStamp').textContent = stamp(); }, 1000);
+  updatePreview();
+
+  // test connection
+  document.getElementById('testBtn').addEventListener('click', ()=>{
+    const status = document.getElementById('connStatus');
+    status.innerHTML = '<div class="dot" style="background:var(--amber);"></div><span>Sending…</span>';
+    setTimeout(()=>{
+      status.innerHTML = '<div class="dot" style="background:var(--teal);"></div><span style="color:var(--teal);">Test frame delivered</span>';
+    }, 900);
+  });
+
+  // start/stop + simulated log
+  let capturing = false;
+  let frameCount = 0;
+  let demoTimer = null;
+  const startBtn = document.getElementById('statusText');
+
+  function addLogRow(failed){
+    const logArea = document.getElementById('logArea');
+    if(logArea.querySelector('.empty-state')) logArea.innerHTML = '<div class="log-strip" id="logStrip"></div>';
+    const strip = document.getElementById('logStrip');
+    const row = document.createElement('div');
+    row.className = 'log-row';
+    const filename = `${sanitize(document.getElementById('nameOverride').value || 'frame')}_${stamp()}.png`;
+    const time = new Date().toLocaleTimeString('en-GB');
+    row.innerHTML = `
+      <div class="frame-thumb"></div>
+      <div class="log-file">${filename}</div>
+      <div class="log-time">${time}</div>
+      ${failed
+        ? '<div class="chip failed"><div class="dot"></div>Failed · retry</div>'
+        : '<div class="chip sent"><div class="dot"></div>Sent</div>'}
+    `;
+    strip.prepend(row);
+    if(!failed){
+      frameCount++;
+      document.getElementById('statFrames').textContent = frameCount;
+      document.getElementById('statLast').textContent = time;
+    }
+  }
+
+  document.getElementById('startBtn').addEventListener('click', function(){
+    capturing = !capturing;
+    const dot = document.getElementById('statusDot');
+    if(capturing){
+      this.textContent = 'Stop capturing';
+      this.classList.add('active');
+      dot.classList.add('live');
+      document.getElementById('statusText').textContent = 'Capturing';
+      let countdown = 4;
+      document.getElementById('statNext').textContent = countdown + 's';
+      demoTimer = setInterval(()=>{
+        countdown--;
+        if(countdown <= 0){
+          addLogRow(Math.random() < 0.15);
+          countdown = 4;
+        }
+        document.getElementById('statNext').textContent = countdown + 's';
+      }, 1000);
+    } else {
+      this.textContent = 'Start capturing';
+      this.classList.remove('active');
+      dot.classList.remove('live');
+      document.getElementById('statusText').textContent = 'Idle';
+      document.getElementById('statNext').textContent = '—';
+      clearInterval(demoTimer);
+    }
+  });
+</script>
+
+</body>
+</html>
